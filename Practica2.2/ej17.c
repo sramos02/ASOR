@@ -29,14 +29,14 @@ int main(int argc, char *argv[]){
 
 	struct dirent *str;
 	struct stat sb;
-	long int size = 0;
+	long double size = 0;
 	printf("Directory opened sucsesfully\n");
 	while ((str = readdir(dir)) != NULL) {
 		 stat(path, &sb);
 		//It is a regular file
 		if(S_ISREG(sb.st_mode)){
 			printf("%s", str->d_name);
-			size += sb.st_size;
+			size += sb.st_size / 1024;
 
 			//It is executable
 			if(sb.st_mode & S_IXUSR){
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	printf("All regular files occupied %ld kbits", size/1024);
+	printf("All regular files occupied %Lg kbits", size);
 	closedir(path);
 	return 0;
 }
