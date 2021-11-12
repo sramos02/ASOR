@@ -29,14 +29,15 @@ int main(int argc, char *argv[]){
 
 	struct dirent *str;
 	struct stat sb;
-	long double size = 0;
-	printf("Directory opened sucsesfully\n");
+	long int size = 0;
+	printf("Directory opened successfully\n");
 	while ((str = readdir(dir)) != NULL) {
-		 stat(path, &sb);
+		path = str->d_name;
+		stat(path, &sb);
 		//It is a regular file
 		if(S_ISREG(sb.st_mode)){
-			printf("%s", str->d_name);
-			size += sb.st_size / 1024;
+			printf("File: %s", path);
+			size += sb.st_size;
 
 			//It is executable
 			if(sb.st_mode & S_IXUSR){
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]){
 			}
 
 			//It is soft link
+			lstat(path, &sb);
 			if(S_ISLNK(sb.st_mode)){
 				printf("->\n");
 			}
@@ -52,12 +54,12 @@ int main(int argc, char *argv[]){
 		}
 		//It is a directory
 		else if(S_ISDIR(sb.st_mode)){
-			printf("%s", str->d_name);
+			printf("Dir:  %s", str->d_name);
 			printf("/\n");
 		}
 	}
 
-	printf("All regular files occupied %Lg kbits", size);
+	printf("All regular files occupied %ld kbits", size/1024);
 	closedir(path);
 	return 0;
 }
