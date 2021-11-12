@@ -40,11 +40,11 @@ int main(int argc, char *argv[]){
 
 			//It is executable
 			if(sb.st_mode & S_IXUSR){
-				printf("/\n");
+				printf("*\n");
 			}
 
 			//It is soft link
-			else if(S_ISLNK(sb.st_mode)){
+			if(S_ISLNK(sb.st_mode)){
 				printf("->\n");
 			}
 
