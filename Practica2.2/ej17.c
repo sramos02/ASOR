@@ -41,22 +41,21 @@ int main(int argc, char *argv[]){
 
 			//It is executable
 			if(sb.st_mode & S_IXUSR){
-				printf("*\n");
+				printf("*");
 			}
 
 			//It is soft link
 			lstat(path, &sb);
 			if(S_ISLNK(sb.st_mode)){
-				printf("->\n");
+				printf("->");
 			}
-
-			printf("\n");
 		}
 		//It is a directory
 		else if(S_ISDIR(sb.st_mode)){
 			printf("Dir:  %s", str->d_name);
-			printf("/\n");
+			printf("/");
 		}
+		printf("\n");
 	}
 
 	printf("All regular files occupied %ld kbits", size/1024);
