@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int execl(int argc, char* argv[]){
 	pid_t pid = fork();
@@ -23,7 +24,17 @@ int execl(int argc, char* argv[]){
 }
 
 int sys(int argc, char* argv[]){
-	int ret = system(argv[1]);
+	char string[256] = "";
+	int i = 2;
+
+	strcpy(string,  argv[1]);
+	while(i < argc){
+		strcat(string, " ");
+		strcat(string, argv[i]);
+		i++;
+	}
+
+	int ret = system(string);
 	if(ret == -1){
 		perror("system");
 		return -1;
@@ -38,6 +49,6 @@ int main(int argc, char* argv[]){
 		perror("Argumentos invalidos");
 		return -1;
 	}
-	return execl(argc, argv);
-	//return sys(argc, argv);
+	//return execl(argc, argv);
+	return sys(argc, argv);
 }
