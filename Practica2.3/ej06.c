@@ -26,7 +26,7 @@ void hijo(){
 	pid_t sid = getsid(pid);
 	printf("ID SESION: %d\n", sid);
 
-	char * buffer;
+	char buffer[PATH_MAX];
 	char * ret = getcwd(buffer, PATH_MAX);
 	printf("DIRECTORIO ACTUAL: %s\n", buffer);
 
