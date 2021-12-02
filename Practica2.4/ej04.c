@@ -8,13 +8,13 @@
 
 int main(int argc, char* argv[]){
 
-	char* name = pipe;
+	char* name = "pipe";
 	if(argc != 2){
 		perror("Arguments: File");
 		return -1;
 	}
 
-	int fd = open(name, O_RDONLY);
+	int fd = open(name, O_WRONLY);
 	if(fd == -1){
 		perror("Open file");
 		return -1;
