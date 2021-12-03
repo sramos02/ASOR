@@ -35,15 +35,17 @@ int main(int argc, char* argv[]){
 
 
 	//Espera a que haya datos listo en alguna de las pipes
-	char buffer[256];
-	int cambios = 0, numPipe, actPipe; //Init
+	char buffer1[256], buffer2[256];
+	int numPipe, actPipe; //Init
+	int cambios = 0;
 
-	while(cambios != -1){
+	while(!cambios){
 	    	int actPipe;
 
+		//cambios ? (buffer1 == buffer2) = true : false;
 		cambios = select((pipe1 < pipe2) ? pipe2 + 1 : pipe1 + 1, &conjunto, NULL, NULL, NULL);
 
-		if (cambios > 0){
+		if (cambios){
 			//Definimos en qué pipe nos encontramos.
 			if (FD_ISSET(pipe1, &conjunto)) {
 				numPipe = 1;
@@ -53,15 +55,17 @@ int main(int argc, char* argv[]){
 				numPipe = 2;
 				actPipe = pipe2;
 			}
-		}
 
-		if(numPipe == 1){
-			close(pipe1);
-			pipe1 = open(name1, O_RDONLY | O_NONBLOCK);
-		}
-		else{
-			close(pipe2);
-			pipe2 = open(name2, O_RDONLY | O_NONBLOCK);
+
+			//Cierra la pipe y vuelve a abrirla
+			if(numPipe == 1){
+				close(pipe1);
+				pipe1 = open(name1, O_RDONLY | O_NONBLOCK);
+			}
+			else{
+				close(pipe2);
+				pipe2 = open(name2, O_RDONLY | O_NONBLOCK);
+			}
 		}
 	}
 	return 0;
