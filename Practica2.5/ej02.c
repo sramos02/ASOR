@@ -5,6 +5,9 @@
 
 #include <time.h>
 
+#include <string.h>
+
+
 int main(int argc, char* argv[]){
 	if(argc != 3){
 		perror("Invalid arguments\n");
@@ -21,10 +24,6 @@ int main(int argc, char* argv[]){
 	hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
 	hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
 	hints.ai_protocol = 0;          /* Any protocol */
-	//hints.ai_canonname = NULL;
-	//hints.ai_addr = NULL;
-	//hints.ai_next = NULL;
-
 
 	if(getaddrinfo(argv[1], argv[2], &hints, &result) != 0){
 		perror("Getaddrinfo error\n");
@@ -33,43 +32,50 @@ int main(int argc, char* argv[]){
 
 	int udp = socket(result->ai_family, result->ai_socktype, result->ai_protocol);	
 	bind(udp, result->ai_addr, result->ai_addrlen);
+	freeaddrinfo(result);
 
 	//Comandos: t(time), d(date), q(quit)
 
+	struct sockaddr_storage client_addr;
+ 	socklen_t client_addrlen = sizeof(client_addr);
+	char buf[2], host[NI_MAXHOST], port[NI_MAXSERV];
+
 	while(1){
-		struct tm *act = localtime(time(0));
+		const time_t t = time(0);
+		struct tm *act = localtime(&t);
 
-		char buf[2], host[128], port[3];
-		struct sockaddr *client_addr;
-		socklen_t client_addrlen = sizeof(client_addr);		
+		recvfrom(udp, buf, 2, 0, (struct sockaddr *) &client_addr, &client_addrlen);
 
-		recvfrom(udp, buf, 2, 0, client_addr, &client_addrlen);
-		getnameinfo(client_addr, client_addrlen, host, 128, port, 3, NI_NUMERICHOST|NI_NUMERICSERV);
+		getnameinfo((struct sockaddr *) &client_addr, client_addrlen, host, NI_MAXHOST, port, NI_MAXSERV, NI_NUMERICHOST|NI_NUMERICSERV);
 
-		printf("Recibidos mensaje %c de %s:%s\n", buf[0], host, port);
+		printf("Recibido mensaje %c de %s:%s\n", buf[0], host, port);
 
-		char command = buf[0];
 		char s[50];
-		size_t max;
 
-		switch(command){
+		switch(buf[0]){
 			case 't':;
-				size_t b = strftime(s, max, "%I:%M:%S %p", act);	
-				s[b] = '\0';
-       			sendto(udp, s, b, 0, client_addr, client_addrlen);
-				//printf("%s:%s:%s\n", act->tm_hour, act->tm_min, act->tm_sec);
+				size_t b = strftime(s, 50, "%I:%M:%S %p\n", act);	
+				printf("%s\n",s);
+       			sendto(udp, s, b, 0, (struct sockaddr *) &client_addr, client_addrlen);
 
 			break;
 			case 'd':;
- 	   	 	 	size_t b2 = strftime(s, max, "%Y-%m-%d", act);
-				s[b2] = '\0';
-       			sendto(udp, s, b, 0, client_addr, client_addrlen);
-				//printf("%d %s de %s\n", act->tm_mday, act->tm_mon, act->tm_year+1900);
+ 	   	 	 	size_t b2 = strftime(s, 50, "%d-%m-%Y\n", act);
+				printf("%s\n",s);
+       			sendto(udp, s, b, 0, (struct sockaddr *) &client_addr, client_addrlen);
+
 			break;
 			case 'q':;
+				char msg[17] = "Fin de conexión\n";
+       			sendto(udp, msg, 17, 0, (struct sockaddr *) &client_addr, client_addrlen);
 				return 0;
 			break;
+
 			default:;
+				char msg2[31] = "No se ha reconocido el comando\n";
+				printf("%s\n", msg2);
+       			sendto(udp, msg2, 31, 0, (struct sockaddr *) &client_addr, client_addrlen);
+			break;
 		}
 	}	
 	return 0;
