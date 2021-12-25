@@ -15,11 +15,9 @@ int main(int argc, char* argv[]){
 
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = 0;
+	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = 0;
-	hints.ai_addr = NULL;
-	hints.ai_canonname = NULL;
-	hints.ai_next = NULL;
+
 
 	if(getaddrinfo(argv[1], NULL, &hints, &result) != 0){
 		perror("Getaddrinfo error\n");	
