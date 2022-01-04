@@ -18,7 +18,7 @@ int main(int argc, char* argv[]){
 	strcat(buf, "/tmp/daemon.out");
 	printf("%s\n",buf);
         int fd = open(buf, O_CREAT);
-        dup2(fd,1);
+        dup2(fd,1); //Copia la salida del demonio a la salida std
         close(fd);
 
 
