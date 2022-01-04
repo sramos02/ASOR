@@ -10,12 +10,13 @@ int main() {
    cout << "Introduzca el nuevo uid: ";
    cin >> uid;
 
-   errno = setuid(uid);
+   errno = 
 
-   if(errno == 0) cout << "Se ha completado la operación\n"; 
-   else{
+   if(setuid(uid) != 0) {
 	cout << strerror(errno) << endl;
-	//perror(errno);
+   	return 1;
    }
-   return 1;
+	
+   cout << "Se ha completado la operación\n";
+   return 0;
 }
